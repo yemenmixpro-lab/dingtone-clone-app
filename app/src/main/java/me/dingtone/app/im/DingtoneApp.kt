@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.sp
 import me.dingtone.app.im.ui.theme.AccentGreen
 import me.dingtone.app.im.ui.theme.BrandBlue
 import me.dingtone.app.im.ui.theme.BrandSoftBlue
-import me.dingtone.app.im.ui.theme.DividerColor
 import me.dingtone.app.im.ui.theme.SurfaceLight
 import me.dingtone.app.im.ui.theme.TextPrimary
 import me.dingtone.app.im.ui.theme.TextSecondary
@@ -393,10 +392,15 @@ fun CallsTabContent(onLogout: () -> Unit) {
     ) {
         item { TopHeaderCard() }
         item { SearchBar() }
-        item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            QuickActionCard("مكالمة صوتية", Icons.Default.Call, AccentGreen)
-            QuickActionCard("مكالمة فيديو", Icons.Default.ContactPhone, BrandBlue)
-        } }
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                QuickActionCard("مكالمة صوتية", Icons.Default.Call, AccentGreen)
+                QuickActionCard("مكالمة فيديو", Icons.Default.ContactPhone, BrandBlue)
+            }
+        }
         item { SectionTitle("سجل المكالمات") }
         items(
             listOf(
@@ -463,15 +467,9 @@ fun SettingsTabContent(onLogout: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item { SectionTitle("الإعدادات") }
-        item {
-            SettingsCard("الحساب", Icons.Default.Person)
-        }
-        item {
-            SettingsCard("الخصوصية", Icons.Default.Security)
-        }
-        item {
-            SettingsCard("التنبيهات", Icons.Default.CheckCircle)
-        }
+        item { SettingsCard("الحساب", Icons.Default.Person) }
+        item { SettingsCard("الخصوصية", Icons.Default.Security) }
+        item { SettingsCard("التنبيهات", Icons.Default.CheckCircle) }
         item {
             Button(
                 onClick = onLogout,
@@ -691,7 +689,9 @@ fun SettingsCard(title: String, icon: ImageVector) {
             Box(
                 modifier = Modifier.size(40.dp).clip(CircleShape).background(BrandSoftBlue),
                 contentAlignment = Alignment.Center
-            ) { Icon(icon, contentDescription = null, tint = BrandBlue) }
+            ) {
+                Icon(icon, contentDescription = null, tint = BrandBlue)
+            }
             Text(title, fontWeight = FontWeight.SemiBold, color = TextPrimary)
         }
     }

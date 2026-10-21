@@ -1,6 +1,8 @@
 package me.dingtone.app.im
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,14 +18,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContactPhone
+import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -55,23 +61,47 @@ import androidx.compose.ui.unit.sp
 import me.dingtone.app.im.ui.theme.AccentGreen
 import me.dingtone.app.im.ui.theme.BrandBlue
 import me.dingtone.app.im.ui.theme.BrandSoftBlue
+import me.dingtone.app.im.ui.theme.DividerColor
 import me.dingtone.app.im.ui.theme.SurfaceLight
 import me.dingtone.app.im.ui.theme.TextPrimary
 import me.dingtone.app.im.ui.theme.TextSecondary
 
+enum class AppScreen {
+    LOGIN,
+    SIGNUP,
+    FORGOT_PASSWORD,
+    HOME
+}
+
 @Composable
 fun DingtoneApp() {
-    var isLoggedIn by rememberSaveable { mutableStateOf(false) }
+    var currentScreen by rememberSaveable { mutableStateOf(AppScreen.LOGIN) }
 
-    if (isLoggedIn) {
-        HomeScreen()
-    } else {
-        LoginScreen(onLoginSuccess = { isLoggedIn = true })
+    when (currentScreen) {
+        AppScreen.LOGIN -> LoginScreen(
+            onLoginSuccess = { currentScreen = AppScreen.HOME },
+            onCreateAccount = { currentScreen = AppScreen.SIGNUP },
+            onForgotPassword = { currentScreen = AppScreen.FORGOT_PASSWORD }
+        )
+        AppScreen.SIGNUP -> SignUpScreen(
+            onBackToLogin = { currentScreen = AppScreen.LOGIN },
+            onRegisterSuccess = { currentScreen = AppScreen.HOME }
+        )
+        AppScreen.FORGOT_PASSWORD -> ForgotPasswordScreen(
+            onBackToLogin = { currentScreen = AppScreen.LOGIN }
+        )
+        AppScreen.HOME -> HomeScreen(
+            onLogout = { currentScreen = AppScreen.LOGIN }
+        )
     }
 }
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    onCreateAccount: () -> Unit,
+    onForgotPassword: () -> Unit
+) {
     var phone by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
@@ -82,7 +112,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         BrandBlue,
-                        BrandBlue.copy(alpha = 0.92f),
+                        BrandBlue.copy(alpha = 0.95f),
                         SurfaceLight
                     )
                 )
@@ -104,7 +134,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(52.dp)
+                            .size(56.dp)
                             .clip(CircleShape)
                             .background(BrandSoftBlue),
                         contentAlignment = Alignment.Center
@@ -170,10 +200,10 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(onClick = {}) {
+                    TextButton(onClick = onForgotPassword) {
                         Text("نسيت كلمة المرور؟")
                     }
-                    TextButton(onClick = {}) {
+                    TextButton(onClick = onCreateAccount) {
                         Text("إنشاء حساب")
                     }
                 }
@@ -193,12 +223,134 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 }
 
 @Composable
-fun HomeScreen() {
+fun SignUpScreen(
+    onBackToLogin: () -> Unit,
+    onRegisterSuccess: () -> Unit
+) {
+    var fullName by rememberSaveable { mutableStateOf("") }
+    var phone by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SurfaceLight)
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.AccountCircle, contentDescription = null, tint = BrandBlue)
+                    Text(
+                        text = "إنشاء حساب جديد",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                }
+
+                OutlinedTextField(
+                    value = fullName,
+                    onValueChange = { fullName = it },
+                    label = { Text("الاسم الكامل") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = { Text("رقم الهاتف") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("كلمة المرور") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Button(
+                    onClick = onRegisterSuccess,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandBlue)
+                ) {
+                    Text("إنشاء الحساب")
+                }
+
+                TextButton(onClick = onBackToLogin, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    Text("العودة لتسجيل الدخول")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ForgotPasswordScreen(onBackToLogin: () -> Unit) {
+    var email by rememberSaveable { mutableStateOf("") }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SurfaceLight)
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(18.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.LockReset, contentDescription = null, tint = BrandBlue)
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = "استعادة كلمة المرور",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                }
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("البريد الإلكتروني") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Button(
+                    onClick = onBackToLogin,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandBlue)
+                ) {
+                    Text("إرسال رابط الاستعادة")
+                }
+                TextButton(onClick = onBackToLogin, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    Text("العودة لتسجيل الدخول")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeScreen(onLogout: () -> Unit) {
     val tabs = listOf(
         TabItem("المكالمات", Icons.Default.Call),
         TabItem("جهات الاتصال", Icons.Default.ContactPhone),
         TabItem("الرسائل", Icons.Default.ChatBubble),
-        TabItem("المزيد", Icons.Default.MoreHoriz)
+        TabItem("الإعدادات", Icons.Default.Settings)
     )
 
     var selectedTab by rememberSaveable { mutableStateOf(0) }
@@ -217,36 +369,116 @@ fun HomeScreen() {
             }
         }
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(SurfaceLight)
-                .padding(paddingValues),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+                .padding(paddingValues)
         ) {
-            item { TopHeaderCard() }
-            item { SearchBar() }
-            item { SectionTitle("الإجراءات السريعة") }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    QuickActionCard("مكالمة صوتية", Icons.Default.Call, AccentGreen)
-                    QuickActionCard("إرسال رسالة", Icons.Default.ChatBubble, BrandBlue)
-                }
+            when (selectedTab) {
+                0 -> CallsTabContent(onLogout = onLogout)
+                1 -> ContactsTabContent()
+                2 -> MessagesTabContent()
+                else -> SettingsTabContent(onLogout = onLogout)
             }
-            item { SectionTitle("سجل المكالمات") }
-            items(
-                listOf(
-                    CallEntry("أحمد", "الآن", "12:04 دقيقة"),
-                    CallEntry("سارة", "أمس", "8:32 دقيقة"),
-                    CallEntry("أميرة", "الاثنين", "4:16 دقيقة"),
-                    CallEntry("خالد", "السبت", "18:10 دقيقة")
-                )
-            ) { call ->
-                CallRow(call)
+        }
+    }
+}
+
+@Composable
+fun CallsTabContent(onLogout: () -> Unit) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp)
+    ) {
+        item { TopHeaderCard() }
+        item { SearchBar() }
+        item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            QuickActionCard("مكالمة صوتية", Icons.Default.Call, AccentGreen)
+            QuickActionCard("مكالمة فيديو", Icons.Default.ContactPhone, BrandBlue)
+        } }
+        item { SectionTitle("سجل المكالمات") }
+        items(
+            listOf(
+                CallEntry("أحمد", "الآن", "12:04 دقيقة"),
+                CallEntry("سارة", "أمس", "8:32 دقيقة"),
+                CallEntry("أميرة", "الاثنين", "4:16 دقيقة"),
+                CallEntry("خالد", "الأحد", "18:10 دقيقة")
+            )
+        ) { call ->
+            CallRow(call)
+        }
+        item {
+            TextButton(onClick = onLogout) {
+                Text("تسجيل الخروج")
+            }
+        }
+    }
+}
+
+@Composable
+fun ContactsTabContent() {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item { SectionTitle("جهات الاتصال") }
+        items(
+            listOf(
+                ContactItem("أحمد سالم", "+966 55 123 4567"),
+                ContactItem("سارة محمد", "+966 50 987 6543"),
+                ContactItem("أميرة علي", "+966 59 222 3344"),
+                ContactItem("خالد يوسف", "+966 56 778 9900")
+            )
+        ) { item ->
+            ContactRow(item)
+        }
+    }
+}
+
+@Composable
+fun MessagesTabContent() {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item { SectionTitle("الرسائل") }
+        items(
+            listOf(
+                MessageItem("أحمد", "هل يمكننا الحديث الآن؟", "09:41"),
+                MessageItem("سارة", "مارس العمل جاهز", "أمس"),
+                MessageItem("أميرة", "شكرًا لك على المكالمة", "الأحد"),
+                MessageItem("خالد", "سأرسل لك الملف", "السبت")
+            )
+        ) { item ->
+            MessageRow(item)
+        }
+    }
+}
+
+@Composable
+fun SettingsTabContent(onLogout: () -> Unit) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item { SectionTitle("الإعدادات") }
+        item {
+            SettingsCard("الحساب", Icons.Default.Person)
+        }
+        item {
+            SettingsCard("الخصوصية", Icons.Default.Security)
+        }
+        item {
+            SettingsCard("التنبيهات", Icons.Default.CheckCircle)
+        }
+        item {
+            Button(
+                onClick = onLogout,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue)
+            ) {
+                Text("تسجيل الخروج")
             }
         }
     }
@@ -384,5 +616,88 @@ fun CallRow(entry: CallEntry) {
     }
 }
 
+@Composable
+fun ContactRow(item: ContactItem) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = Modifier.fillMaxWidth().clickable { }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier.size(40.dp).clip(CircleShape).background(BrandSoftBlue),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Person, contentDescription = null, tint = BrandBlue)
+                }
+                Spacer(modifier = Modifier.size(12.dp))
+                Column {
+                    Text(item.name, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    Text(item.phone, color = TextSecondary)
+                }
+            }
+            Icon(Icons.Default.Call, contentDescription = null, tint = AccentGreen)
+        }
+    }
+}
+
+@Composable
+fun MessageRow(item: MessageItem) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier.size(40.dp).clip(CircleShape).background(BrandSoftBlue),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.ChatBubble, contentDescription = null, tint = BrandBlue)
+                }
+                Spacer(modifier = Modifier.size(12.dp))
+                Column {
+                    Text(item.sender, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    Text(item.preview, color = TextSecondary)
+                }
+            }
+            Text(item.time, color = TextSecondary)
+        }
+    }
+}
+
+@Composable
+fun SettingsCard(title: String, icon: ImageVector) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Box(
+                modifier = Modifier.size(40.dp).clip(CircleShape).background(BrandSoftBlue),
+                contentAlignment = Alignment.Center
+            ) { Icon(icon, contentDescription = null, tint = BrandBlue) }
+            Text(title, fontWeight = FontWeight.SemiBold, color = TextPrimary)
+        }
+    }
+}
+
 data class TabItem(val title: String, val icon: ImageVector)
 data class CallEntry(val name: String, val date: String, val duration: String)
+data class ContactItem(val name: String, val phone: String)
+data class MessageItem(val sender: String, val preview: String, val time: String)

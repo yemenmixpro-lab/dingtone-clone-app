@@ -1,43 +1,14 @@
-package me.dingtone.app.im.ui.theme
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.google.gms:google-services:4.4.2")
+    }
+}
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-
-private val LightColors = lightColorScheme(
-    primary = BrandBlue,
-    secondary = AccentGreen,
-    tertiary = AccentOrange,
-    background = SurfaceLight,
-    surface = SurfaceCard,
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onBackground = TextPrimary,
-    onSurface = TextPrimary,
-)
-
-private val DarkColors = darkColorScheme(
-    primary = BrandBlue,
-    secondary = AccentGreen,
-    tertiary = AccentOrange,
-    background = BrandDark,
-    surface = BrandDark,
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onBackground = Color.White,
-    onSurface = Color.White,
-)
-
-@Composable
-fun DingtoneCloneTheme(
-    darkTheme: Boolean = false,
-    content: @Composable () -> Unit
-) {
-    val colors = if (darkTheme) DarkColors else LightColors
-    MaterialTheme(
-        colorScheme = colors,
-        content = content
-    )
+plugins {
+    id("com.android.application") version "8.5.2" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.24" apply false
 }

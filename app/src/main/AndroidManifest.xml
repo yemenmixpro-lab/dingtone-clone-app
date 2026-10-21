@@ -1,20 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application
-        android:allowBackup="true"
-        android:icon="@android:drawable/sym_def_app_icon"
-        android:label="@string/app_name"
-        android:roundIcon="@android:drawable/sym_def_app_icon"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.DingtoneClone">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:theme="@style/Theme.DingtoneClone">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-</manifest>
+package me.dingtone.app.im.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+val BrandBlue = Color(0xFF2B6AFB)
+val BrandDark = Color(0xFF0C1427)
+val BrandSoftBlue = Color(0xFFEDF4FF)
+val AccentGreen = Color(0xFF29C274)
+val AccentOrange = Color(0xFFFFA726)
+val SurfaceLight = Color(0xFFF5F8FF)
+val SurfaceCard = Color(0xFFFFFFFF)
+val TextPrimary = Color(0xFF0F172A)
+val TextSecondary = Color(0xFF64748B)
+val DividerColor = Color(0xFFE2E8F0)

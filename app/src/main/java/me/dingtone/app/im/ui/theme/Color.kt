@@ -1,14 +1,43 @@
 package me.dingtone.app.im.ui.theme
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-val BrandBlue = Color(0xFF2B6AFB)
-val BrandDark = Color(0xFF0C1427)
-val BrandSoftBlue = Color(0xFFEDF4FF)
-val AccentGreen = Color(0xFF29C274)
-val AccentOrange = Color(0xFFFFA726)
-val SurfaceLight = Color(0xFFF5F8FF)
-val SurfaceCard = Color(0xFFFFFFFF)
-val TextPrimary = Color(0xFF0F172A)
-val TextSecondary = Color(0xFF64748B)
-val DividerColor = Color(0xFFE2E8F0)
+private val LightColors = lightColorScheme(
+    primary = BrandBlue,
+    secondary = AccentGreen,
+    tertiary = AccentOrange,
+    background = SurfaceLight,
+    surface = SurfaceCard,
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onBackground = TextPrimary,
+    onSurface = TextPrimary,
+)
+
+private val DarkColors = darkColorScheme(
+    primary = BrandBlue,
+    secondary = AccentGreen,
+    tertiary = AccentOrange,
+    background = BrandDark,
+    surface = BrandDark,
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White,
+)
+
+@Composable
+fun DingtoneCloneTheme(
+    darkTheme: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    val colors = if (darkTheme) DarkColors else LightColors
+    MaterialTheme(
+        colorScheme = colors,
+        content = content
+    )
+}
